@@ -1092,8 +1092,7 @@ and expr = parser
 		(match b with
 		| EObjectDecl _ -> expr_next e s
 		| _ -> e)
-	| [< '(Kwd Macro,p); s >] ->
-		parse_macro_expr p s
+	| [< '(Kwd Macro,p); s >] -> parse_macro_expr p s
 	| [< '(Kwd Var,p1); v = parse_var_decl >] -> (EVars [v],p1)
 	| [< '(Const c,p); s >] -> expr_next (EConst c,p) s
 	| [< '(Kwd This,p); s >] -> expr_next (EConst (Ident "this"),p) s
@@ -1146,12 +1145,47 @@ and expr = parser
 		| [< '(Const (Int i),p); e = expr_next (EConst (Int i),p) >] -> e
 		| [< '(Const (Float f),p); e = expr_next (EConst (Float f),p) >] -> e
 		| [< >] -> serror()) */*)
-	| [< '(Kwd For,p); '(POpen,_); it = expr; '(PClose,_); s >] ->
-		(try
-			let e = secure_expr s in
-			(EFor (it,e),punion p (pos e))
-		with
-			Display e -> display (EFor (it,e),punion p (pos e)))
+	
+	(* | [< '(Kwd For,p); '(POpen,_); it = expr; '(PClose,_); s >] ->             *)
+  (*               (try                                                         *)
+  (*                       let e = secure_expr s in                             *)
+  (*                       (EFor (it,e),punion p (pos e))                       *)
+  (*               with                                                         *)
+  (*                       Display e -> display (EFor (it,e),punion p (pos e))) *)
+	| [< '(Kwd For,p); '(POpen,_); sss>] ->
+        (match sss with parser
+        | [<'(Kwd Var,p1); v = parse_var_decl;'(Semicolon,_);ss>] ->
+              (match ss with parser
+    					| [<cond = expr; '(Semicolon,_); iter = expr; '(PClose,_); s >] ->
+									(try
+      								let e = secure_expr s  in
+      										(EBlock[ (EVars [v],p1); (EIf(cond,(EWhile ((EBlock[iter;cond],p),e,DoWhile),pos e),None),p) ],p)
+      								with
+      										Display e -> display (EBlock[ (EVars [v],p1) ; (EIf(cond,(EWhile ((EBlock[e;cond],p),e,DoWhile),pos e),None),p)],p)))
+				| [<'(Const i ,p1)  ; eee >]->
+					(match eee with parser
+						| [<'(Kwd In,_); ee = expr;'(PClose,_); ss >] ->
+  							(try
+                		let e = secure_expr ss  in
+                			(EFor ((EIn ((EConst i,p1),ee), punion p1 (pos ee)),e),punion p (pos e))
+              	with
+              			Display e -> display (EFor ((EIn ((EConst i,p1),ee), punion p1 (pos ee)),e),punion p (pos e)))
+						| [< varIdent = expr_next (EConst i,p1) ; ss>] ->
+							(match ss with parser
+      					| [<'(Semicolon,_);cond = expr; '(Semicolon,_); iter = expr; '(PClose,_); s >] ->
+  									(try
+        								let e = secure_expr s  in
+        										(EBlock[ varIdent; (EIf(cond,(EWhile ((EBlock[iter;cond],p),e,DoWhile),pos e),None),p) ],p)
+        								with
+        										Display e -> display (EBlock[ varIdent ; (EIf(cond,(EWhile ((EBlock[e;cond],p),e,DoWhile),pos e),None),p)],p))														
+    						| [<  '(PClose,_); ss >] ->		
+    							  (try
+                    		let e = secure_expr ss  in
+                    			(EFor ((EConst i,p1),e),p1)
+                  	 with
+                  			Display e -> display (EFor ((EConst i,p1),e),p1))	)))
+					
+      	
 	| [< '(Kwd If,p); '(POpen,_); cond = expr; '(PClose,_); e1 = expr; s >] ->
 		let e2 = (match s with parser
 			| [< '(Kwd Else,_); e2 = expr; s >] -> Some e2

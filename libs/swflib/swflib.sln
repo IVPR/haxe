@@ -1,0 +1,19 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "swflib", "swflib.vcproj", "{A9DD9D90-85E1-4FCF-8C09-42BF78942849}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Bytecode|Win32 = Bytecode|Win32
+		Native code|Win32 = Native code|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A9DD9D90-85E1-4FCF-8C09-42BF78942849}.Bytecode|Win32.ActiveCfg = Bytecode|Win32
+		{A9DD9D90-85E1-4FCF-8C09-42BF78942849}.Bytecode|Win32.Build.0 = Bytecode|Win32
+		{A9DD9D90-85E1-4FCF-8C09-42BF78942849}.Native code|Win32.ActiveCfg = Native code|Win32
+		{A9DD9D90-85E1-4FCF-8C09-42BF78942849}.Native code|Win32.Build.0 = Native code|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
